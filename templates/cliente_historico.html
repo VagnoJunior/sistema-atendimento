@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Histórico do Cliente</title>
+</head>
+<body>
+
+<h2>Cliente: {{ cliente[1] }}</h2>
+
+<p><strong>Telefone:</strong> {{ cliente[2] }}</p>
+<p><strong>Email:</strong> {{ cliente[3] }}</p>
+
+<hr>
+
+<h3>Histórico de Atendimentos</h3>
+
+<ul>
+{% for a in atendimentos %}
+    <li>
+        <strong>Assunto:</strong> {{ a[0] }} <br>
+        <strong>Data:</strong> {{ a[1] }} <br>
+        <strong>Status:</strong> {{ a[2] }}
+    </li>
+    <br>
+{% else %}
+    <li>Nenhum atendimento registrado</li>
+{% endfor %}
+</ul>
+
+<a href="/clientes">Voltar para clientes</a>
+
+</body>
+</html>
