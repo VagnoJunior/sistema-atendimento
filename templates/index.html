@@ -1,19 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sistema</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>Painel</title>
+    <style>
+        body { font-family: Arial; margin:20px; background:#f4f4f4; }
+        a { margin-right:10px; }
+    </style>
 </head>
 <body>
-
-<h1>Sistema de Atendimento</h1>
-<p>Bem-vindo, {{ usuario }}</p>
-
-<nav>
+    <h2>Bem-vindo, {{ nome }}</h2>
     <a href="/clientes">Clientes</a>
     <a href="/atendimentos">Atendimentos</a>
     <a href="/logout">Sair</a>
-</nav>
-
 </body>
 </html>
