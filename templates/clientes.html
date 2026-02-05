@@ -1,30 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Clientes</title>
+    <title>Atendimentos</title>
     <style>
         body { font-family: Arial; margin:20px; background:#f4f4f4; }
-        table { width:100%; border-collapse: collapse; }
+        table { width:100%; border-collapse: collapse; margin-top:10px; }
         th, td { border:1px solid #ccc; padding:8px; text-align:left; }
-        input { padding:5px; margin:5px; }
+        input, select, textarea { margin:5px; padding:5px; }
+        button { padding:5px 10px; background:#28a745; color:white; border:none; cursor:pointer; }
     </style>
 </head>
 <body>
-    <h2>Clientes</h2>
-    <form method="POST">
-        <input name="nome" placeholder="Nome" required>
-        <input name="telefone" placeholder="Telefone" required>
-        <input name="email" placeholder="Email">
-        <button>Cadastrar</button>
+    <h2>Atendimentos</h2>
+
+    <form method="GET">
+        <input type="text" name="busca" placeholder="Buscar cliente ou assunto" value="{{ busca }}">
+        <button>Buscar</button>
     </form>
+
+    <form method="POST">
+        <select name="cliente" required>
+            <option value="">Selecione o cliente</option>
+            {% for cl in clientes %}
+            <option value="{{ cl[0] }}">{{ cl[1] }}</option>
+            {% endfor %}
+        </select>
+        <input name="assunto" placeholder="Assunto" required>
+        <textarea name="descricao" placeholder="Descrição" required></textarea>
+        <input type="date" name="data" required>
+        <button>Cadastrar Atendimento</button>
+    </form>
+
     <table>
-        <tr><th>Nome</th><th>Telefone</th><th>Email</th><th>Histórico</th></tr>
-        {% for c in clientes %}
+        <tr><th>Cliente</th><th>Assunto</th><th>Status</th><th>Data</th><th>Ações</th></tr>
+        {% for a in atendimentos %}
         <tr>
-            <td>{{ c[1] }}</td>
-            <td>{{ c[2] }}</td>
-            <td>{{ c[3] }}</td>
-            <td><a href="/cliente/{{ c[0] }}">Ver histórico</a></td>
+            <td>{{ a[1] }}</td>
+            <td>{{ a[2] }}</td>
+            <td>{{ a[3] }}</td>
+            <td>{{ a[4] }}</td>
+            <td>
+                {% if a[3] == "Aberto" %}
+                <a href="/concluir/{{ a[0] }}">✅ Concluir</a>
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </table>
