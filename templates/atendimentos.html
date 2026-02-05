@@ -1,42 +1,45 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>Atendimentos</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>Novo Atendimento</h1>
 
-    <form method="POST">
-        <select name="cliente" required>
-            <option value="">Selecione o cliente</option>
-            {% for cliente in clientes %}
-                <option value="{{ cliente[0] }}">{{ cliente[1] }}</option>
-            {% endfor %}
-        </select><br><br>
+<h2>Novo Atendimento</h2>
 
-        <input type="text" name="assunto" placeholder="Assunto" required><br><br>
-
-        <textarea name="descricao" placeholder="Descrição do atendimento" required></textarea><br><br>
-
-        <button type="submit">Salvar Atendimento</button>
-    </form>
-
-    <hr>
-
-    <h2>Lista de Atendimentos</h2>
-    <ul>
-        {% for a in atendimentos %}
-            <li>
-                {{ a[1] }} | {{ a[2] }} | {{ a[3] }} | {{ a[4] }}
-                {% if a[3] == "Aberto" %}
-                    - <a href="/concluir/{{ a[0] }}">Concluir</a>
-                {% endif %}
-            </li>
+<form method="post">
+    <select name="cliente_id" required>
+        {% for c in clientes %}
+        <option value="{{ c[0] }}">{{ c[1] }}</option>
         {% endfor %}
-    </ul>
+    </select>
 
-    <br>
-    <a href="/">Voltar</a>
+    <input name="assunto" placeholder="Assunto" required>
+    <textarea name="descricao" placeholder="Descrição"></textarea>
+    <button>Criar</button>
+</form>
+
+<h3>Lista</h3>
+
+<table>
+<tr>
+    <th>Cliente</th>
+    <th>Assunto</th>
+    <th>Status</th>
+    <th>Data</th>
+</tr>
+{% for a in atendimentos %}
+<tr>
+    <td>{{ a[1] }}</td>
+    <td>{{ a[2] }}</td>
+    <td>{{ a[3] }}</td>
+    <td>{{ a[4] }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<a href="/">Voltar</a>
+
 </body>
 </html>
