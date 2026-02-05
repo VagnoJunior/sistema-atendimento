@@ -65,8 +65,11 @@ def atendimentos():
 
     if request.method == "POST":
         c.execute(
-            "INSERT INTO atendimentos (cliente_id, assunto, descricao, data, status)
-            VALUES (?, ?, ?, ?, ?)",
+            """
+            INSERT INTO atendimentos
+            (cliente_id, assunto, descricao, data, status)
+            VALUES (?, ?, ?, ?, ?)
+            """,
             (
                 request.form["cliente"],
                 request.form["assunto"],
