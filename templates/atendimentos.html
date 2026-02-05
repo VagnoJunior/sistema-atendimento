@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Atendimentos</title>
+</head>
+<body>
+    <h1>Novo Atendimento</h1>
+
+    <form method="POST">
+        <select name="cliente" required>
+            <option value="">Selecione o cliente</option>
+            {% for cliente in clientes %}
+                <option value="{{ cliente[0] }}">{{ cliente[1] }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <input type="text" name="assunto" placeholder="Assunto" required><br><br>
+
+        <textarea name="descricao" placeholder="Descrição do atendimento" required></textarea><br><br>
+
+        <button type="submit">Salvar Atendimento</button>
+    </form>
+
+    <hr>
+
+    <h2>Lista de Atendimentos</h2>
+    <ul>
+        {% for a in atendimentos %}
+            <li>
+                {{ a[1] }} | {{ a[2] }} | {{ a[3] }} | {{ a[4] }}
+                {% if a[3] == "Aberto" %}
+                    - <a href="/concluir/{{ a[0] }}">Concluir</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <br>
+    <a href="/">Voltar</a>
+</body>
+</html>
