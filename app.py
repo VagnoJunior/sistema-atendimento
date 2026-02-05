@@ -5,13 +5,13 @@ import os
 
 app = Flask(__name__)
 
-# -------- CAMINHO DO BANCO (IMPORTANTE PARA PRODUÇÃO) --------
+# ===== CONFIGURAÇÃO DO BANCO (PRODUÇÃO OK) =====
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "banco.db")
 
 def conectar():
-    return sqlite3.connect(DB_PATH)
+    return sqlite3.connect(DB_PATH, check_same_thread=False)
 
 def criar_banco():
     conn = conectar()
@@ -20,7 +20,7 @@ def criar_banco():
     c.execute("""
     CREATE TABLE IF NOT EXISTS clientes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT,
+        nome TEXT NOT NULL,
         telefone TEXT,
         email TEXT
     )
@@ -42,7 +42,7 @@ def criar_banco():
 
 criar_banco()
 
-# -------- ROTAS --------
+# ===== ROTAS =====
 
 @app.route("/", methods=["GET", "POST"])
 def login():
