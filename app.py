@@ -1,11 +1,14 @@
 from flask import Flask, render_template, request, redirect
 import sqlite3
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 
+DB = "banco.db"
+
 def conectar():
-    return sqlite3.connect("banco.db")
+    return sqlite3.connect(DB)
 
 @app.route("/")
 def index():
@@ -16,33 +19,22 @@ def clientes():
     conn = conectar()
     c = conn.cursor()
 
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS clientes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,
-            telefone TEXT NOT NULL,
-            email TEXT
-        )
-    """)
-
     if request.method == "POST":
+        nome = request.form["nome"]
+        telefone = request.form["telefone"]
+        email = request.form["email"]
+
         c.execute(
             "INSERT INTO clientes (nome, telefone, email) VALUES (?, ?, ?)",
-            (
-                request.form["nome"],
-                request.form["telefone"],
-                request.form["email"]
-            )
+            (nome, telefone, email)
         )
         conn.commit()
-        conn.close()
-        return redirect("/clientes")
 
     c.execute("SELECT * FROM clientes")
-    lista_clientes = c.fetchall()
+    clientes = c.fetchall()
     conn.close()
 
-    return render_template("clientes.html", clientes=lista_clientes)
+    return render_template("clientes.html", clientes=clientes)
 
 @app.route("/cliente/<int:id>")
 def cliente(id):
@@ -52,15 +44,14 @@ def cliente(id):
     c.execute("SELECT * FROM clientes WHERE id=?", (id,))
     cliente = c.fetchone()
 
-    c.execute("""
-        SELECT assunto, data, status
-        FROM atendimentos
-        WHERE cliente_id=?
-        ORDER BY id DESC
-    """, (id,))
+    c.execute(
+        "SELECT assunto, data, status FROM atendimentos WHERE cliente_id=?",
+        (id,)
+    )
     atendimentos = c.fetchall()
 
     conn.close()
+
     return render_template(
         "cliente_historico.html",
         cliente=cliente,
@@ -72,59 +63,38 @@ def atendimentos():
     conn = conectar()
     c = conn.cursor()
 
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS atendimentos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cliente_id INTEGER,
-            assunto TEXT,
-            descricao TEXT,
-            data TEXT,
-            status TEXT
-        )
-    """)
-
-    c.execute("SELECT id, nome FROM clientes")
-    clientes = c.fetchall()
-
     if request.method == "POST":
+        cliente_id = request.form["cliente_id"]
+        assunto = request.form["assunto"]
+        descricao = request.form["descricao"]
+        data = datetime.now().strftime("%d/%m/%Y %H:%M")
+        status = "Aberto"
+
         c.execute("""
             INSERT INTO atendimentos
             (cliente_id, assunto, descricao, data, status)
             VALUES (?, ?, ?, ?, ?)
-        """, (
-            request.form["cliente"],
-            request.form["assunto"],
-            request.form["descricao"],
-            datetime.now().strftime("%d/%m/%Y %H:%M"),
-            "Aberto"
-        ))
+        """, (cliente_id, assunto, descricao, data, status))
         conn.commit()
-        conn.close()
-        return redirect("/atendimentos")
 
     c.execute("""
-        SELECT atendimentos.id, clientes.nome, assunto, status, data
-        FROM atendimentos
-        JOIN clientes ON clientes.id = atendimentos.cliente_id
-        ORDER BY atendimentos.id DESC
+        SELECT a.id, c.nome, a.assunto, a.status, a.data
+        FROM atendimentos a
+        JOIN clientes c ON a.cliente_id = c.id
+        ORDER BY a.id DESC
     """)
-    lista_atendimentos = c.fetchall()
+    atendimentos = c.fetchall()
+
+    c.execute("SELECT id, nome FROM clientes")
+    clientes = c.fetchall()
+
     conn.close()
 
     return render_template(
         "atendimentos.html",
-        atendimentos=lista_atendimentos,
+        atendimentos=atendimentos,
         clientes=clientes
     )
-
-@app.route("/concluir/<int:id>")
-def concluir(id):
-    conn = conectar()
-    c = conn.cursor()
-    c.execute("UPDATE atendimentos SET status='Concluído' WHERE id=?", (id,))
-    conn.commit()
-    conn.close()
-    return redirect("/atendimentos")
 
 if __name__ == "__main__":
     app.run()
