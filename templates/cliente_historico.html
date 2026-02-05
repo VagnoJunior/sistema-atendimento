@@ -7,7 +7,6 @@
 <body>
 
 <h2>{{ cliente[1] }}</h2>
-
 <p>Telefone: {{ cliente[2] }}</p>
 <p>Email: {{ cliente[3] }}</p>
 
@@ -15,9 +14,7 @@
 
 <ul>
 {% for a in atendimentos %}
-    <li>
-        {{ a[0] }} — {{ a[1] }} — {{ a[2] }}
-    </li>
+    <li>{{ a[0] }} — {{ a[1] }} — {{ a[2] }} — {{ a[3] }}</li>
 {% else %}
     <li>Nenhum atendimento</li>
 {% endfor %}
