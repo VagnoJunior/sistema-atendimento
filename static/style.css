@@ -1,17 +1,11 @@
 body {
     font-family: Arial;
-    background: #f4f4f4;
+    background: #f2f2f2;
     padding: 30px;
 }
 
-h1, h2, h3 {
+h1, h2 {
     color: #333;
-}
-
-nav a, a {
-    margin-right: 15px;
-    text-decoration: none;
-    color: #0066cc;
 }
 
 form input, form textarea, form select {
@@ -26,12 +20,17 @@ button {
     background: #0066cc;
     color: white;
     border: none;
-    cursor: pointer;
+}
+
+a {
+    margin-right: 15px;
+    color: #0066cc;
+    text-decoration: none;
 }
 
 table {
-    border-collapse: collapse;
     background: white;
+    border-collapse: collapse;
 }
 
 table th, table td {
