@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Atendimentos</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Novo Atendimento</h2>
+
+        <form method="post">
+            <select name="cliente" required>
+                <option value="">Cliente</option>
+                {% for c in clientes %}
+                    <option value="{{ c[0] }}">{{ c[1] }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="text" name="assunto" placeholder="Assunto" required>
+            <textarea name="descricao" placeholder="Descrição" required></textarea>
+
+            <button type="submit">Salvar</button>
+        </form>
+
+        <h3>Buscar</h3>
+        <form method="get">
+            <input type="text" name="busca" placeholder="Cliente ou assunto" value="{{ busca }}">
+            <button type="submit">Buscar</button>
+        </form>
+
+        <table>
+            <tr>
+                <th>Cliente</th>
+                <th>Assunto</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Ação</th>
+            </tr>
+
+            {% for a in atendimentos %}
+            <tr>
+                <td>{{ a[2] }}</td>
+                <td>{{ a[3] }}</td>
+                <td class="status-{{ a[4]|lower }}">
+                    {{ a[4] }}
+                </td>
+                <td>{{ a[5] }}</td>
+                <td>
+                    {% if a[4] == "Aberto" %}
+                        <a href="/concluir/{{ a[0] }}">Concluir</a>
+                    {% else %}
+                        ✔
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <a href="/dashboard">Voltar</a>
+    </div>
+</body>
+</html>
