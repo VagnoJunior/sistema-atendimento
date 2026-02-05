@@ -1,31 +1,30 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>Clientes</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>Cadastro de Clientes</h1>
 
-    <form method="POST">
-        <input type="text" name="nome" placeholder="Nome do cliente" required><br><br>
-        <input type="text" name="telefone" placeholder="Telefone" required><br><br>
-        <input type="email" name="email" placeholder="Email (opcional)"><br><br>
-        <button type="submit">Salvar</button>
-    </form>
+<h2>Clientes</h2>
 
-    <hr>
+<form method="post">
+    <input name="nome" placeholder="Nome" required>
+    <input name="telefone" placeholder="Telefone" required>
+    <input name="email" placeholder="Email">
+    <button>Cadastrar</button>
+</form>
 
-    <h2>Clientes Cadastrados</h2>
-    <ul>
-        {% for cliente in clientes %}
-            <li>
-                {{ cliente[1] }} – {{ cliente[2] }} – {{ cliente[3] }}
-            </li>
-        {% endfor %}
-    </ul>
+<ul>
+{% for c in clientes %}
+    <li>
+        {{ c[1] }} —
+        <a href="/cliente/{{ c[0] }}">Ver histórico</a>
+    </li>
+{% endfor %}
+</ul>
 
-    <br>
-    <a href="/">Voltar</a>
+<a href="/">Voltar</a>
+
 </body>
 </html>
