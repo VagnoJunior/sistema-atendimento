@@ -1,32 +1,70 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 import sqlite3
 from datetime import datetime
-import os
 
 app = Flask(__name__)
+app.secret_key = "segredo_simples"
 
 DB = "banco.db"
 
 def conectar():
     return sqlite3.connect(DB)
 
+# ---------- LOGIN ----------
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form["email"]
+        senha = request.form["senha"]
+
+        conn = conectar()
+        c = conn.cursor()
+        c.execute(
+            "SELECT * FROM usuarios WHERE email=? AND senha=?",
+            (email, senha)
+        )
+        user = c.fetchone()
+        conn.close()
+
+        if user:
+            session["usuario"] = user[1]
+            return redirect("/")
+        else:
+            return "Login inválido"
+
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
+
+# ---------- PROTEÇÃO ----------
+def protegido():
+    return "usuario" in session
+
 @app.route("/")
 def index():
+    if not protegido():
+        return redirect("/login")
     return render_template("index.html")
 
 @app.route("/clientes", methods=["GET", "POST"])
 def clientes():
+    if not protegido():
+        return redirect("/login")
+
     conn = conectar()
     c = conn.cursor()
 
     if request.method == "POST":
-        nome = request.form["nome"]
-        telefone = request.form["telefone"]
-        email = request.form["email"]
-
         c.execute(
             "INSERT INTO clientes (nome, telefone, email) VALUES (?, ?, ?)",
-            (nome, telefone, email)
+            (
+                request.form["nome"],
+                request.form["telefone"],
+                request.form["email"]
+            )
         )
         conn.commit()
 
@@ -38,6 +76,9 @@ def clientes():
 
 @app.route("/cliente/<int:id>")
 def cliente(id):
+    if not protegido():
+        return redirect("/login")
+
     conn = conectar()
     c = conn.cursor()
 
@@ -49,7 +90,6 @@ def cliente(id):
         (id,)
     )
     atendimentos = c.fetchall()
-
     conn.close()
 
     return render_template(
@@ -60,21 +100,24 @@ def cliente(id):
 
 @app.route("/atendimentos", methods=["GET", "POST"])
 def atendimentos():
+    if not protegido():
+        return redirect("/login")
+
     conn = conectar()
     c = conn.cursor()
 
     if request.method == "POST":
-        cliente_id = request.form["cliente_id"]
-        assunto = request.form["assunto"]
-        descricao = request.form["descricao"]
-        data = datetime.now().strftime("%d/%m/%Y %H:%M")
-        status = "Aberto"
-
         c.execute("""
             INSERT INTO atendimentos
             (cliente_id, assunto, descricao, data, status)
             VALUES (?, ?, ?, ?, ?)
-        """, (cliente_id, assunto, descricao, data, status))
+        """, (
+            request.form["cliente_id"],
+            request.form["assunto"],
+            request.form["descricao"],
+            datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "Aberto"
+        ))
         conn.commit()
 
     c.execute("""
