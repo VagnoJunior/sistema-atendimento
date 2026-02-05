@@ -3,12 +3,15 @@ import sqlite3
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = "segredo_simples"
+app.secret_key = "chave_secreta_simples"
 
 DB = "banco.db"
 
 def conectar():
     return sqlite3.connect(DB)
+
+def logado():
+    return "usuario_id" in session
 
 # ---------- LOGIN ----------
 @app.route("/login", methods=["GET", "POST"])
@@ -20,17 +23,18 @@ def login():
         conn = conectar()
         c = conn.cursor()
         c.execute(
-            "SELECT * FROM usuarios WHERE email=? AND senha=?",
+            "SELECT id, nome FROM usuarios WHERE email=? AND senha=?",
             (email, senha)
         )
-        user = c.fetchone()
+        usuario = c.fetchone()
         conn.close()
 
-        if user:
-            session["usuario"] = user[1]
+        if usuario:
+            session["usuario_id"] = usuario[0]
+            session["usuario_nome"] = usuario[1]
             return redirect("/")
         else:
-            return "Login inválido"
+            return render_template("login.html", erro="Login inválido")
 
     return render_template("login.html")
 
@@ -39,19 +43,17 @@ def logout():
     session.clear()
     return redirect("/login")
 
-# ---------- PROTEÇÃO ----------
-def protegido():
-    return "usuario" in session
-
+# ---------- HOME ----------
 @app.route("/")
 def index():
-    if not protegido():
+    if not logado():
         return redirect("/login")
-    return render_template("index.html")
+    return render_template("index.html", usuario=session["usuario_nome"])
 
+# ---------- CLIENTES ----------
 @app.route("/clientes", methods=["GET", "POST"])
 def clientes():
-    if not protegido():
+    if not logado():
         return redirect("/login")
 
     conn = conectar()
@@ -76,7 +78,7 @@ def clientes():
 
 @app.route("/cliente/<int:id>")
 def cliente(id):
-    if not protegido():
+    if not logado():
         return redirect("/login")
 
     conn = conectar()
@@ -86,10 +88,11 @@ def cliente(id):
     cliente = c.fetchone()
 
     c.execute(
-        "SELECT assunto, data, status FROM atendimentos WHERE cliente_id=?",
+        "SELECT assunto, descricao, data, status FROM atendimentos WHERE cliente_id=?",
         (id,)
     )
     atendimentos = c.fetchall()
+
     conn.close()
 
     return render_template(
@@ -98,9 +101,10 @@ def cliente(id):
         atendimentos=atendimentos
     )
 
+# ---------- ATENDIMENTOS ----------
 @app.route("/atendimentos", methods=["GET", "POST"])
 def atendimentos():
-    if not protegido():
+    if not logado():
         return redirect("/login")
 
     conn = conectar()
