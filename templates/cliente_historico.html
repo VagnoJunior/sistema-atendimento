@@ -1,26 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Histórico</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>Histórico do Cliente</title>
+    <style>
+        body { font-family: Arial; margin:20px; background:#f4f4f4; }
+        table { width:100%; border-collapse: collapse; margin-top:10px; }
+        th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+    </style>
 </head>
 <body>
-
-<h2>{{ cliente[1] }}</h2>
-<p>Telefone: {{ cliente[2] }}</p>
-<p>Email: {{ cliente[3] }}</p>
-
-<h3>Atendimentos</h3>
-
-<ul>
-{% for a in atendimentos %}
-    <li>{{ a[0] }} — {{ a[1] }} — {{ a[2] }} — {{ a[3] }}</li>
-{% else %}
-    <li>Nenhum atendimento</li>
-{% endfor %}
-</ul>
-
-<a href="/clientes">Voltar</a>
-
+    <h2>Histórico de {{ cliente[1] }}</h2>
+    <table>
+        <tr><th>Assunto</th><th>Status</th><th>Data</th></tr>
+        {% for a in atendimentos %}
+        <tr>
+            <td>{{ a[2] }}</td>
+            <td>{{ a[5] }}</td>
+            <td>{{ a[4] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br><a href="/clientes">Voltar</a>
 </body>
 </html>
