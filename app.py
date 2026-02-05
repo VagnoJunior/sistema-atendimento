@@ -26,13 +26,13 @@ def clientes():
     """)
 
     if request.method == "POST":
-        nome = request.form["nome"]
-        telefone = request.form["telefone"]
-        email = request.form["email"]
-
         c.execute(
             "INSERT INTO clientes (nome, telefone, email) VALUES (?, ?, ?)",
-            (nome, telefone, email)
+            (
+                request.form["nome"],
+                request.form["telefone"],
+                request.form["email"]
+            )
         )
         conn.commit()
         conn.close()
@@ -43,6 +43,29 @@ def clientes():
     conn.close()
 
     return render_template("clientes.html", clientes=lista_clientes)
+
+@app.route("/cliente/<int:id>")
+def cliente(id):
+    conn = conectar()
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM clientes WHERE id=?", (id,))
+    cliente = c.fetchone()
+
+    c.execute("""
+        SELECT assunto, data, status
+        FROM atendimentos
+        WHERE cliente_id=?
+        ORDER BY id DESC
+    """, (id,))
+    atendimentos = c.fetchall()
+
+    conn.close()
+    return render_template(
+        "cliente_historico.html",
+        cliente=cliente,
+        atendimentos=atendimentos
+    )
 
 @app.route("/atendimentos", methods=["GET", "POST"])
 def atendimentos():
@@ -64,20 +87,17 @@ def atendimentos():
     clientes = c.fetchall()
 
     if request.method == "POST":
-        c.execute(
-            """
+        c.execute("""
             INSERT INTO atendimentos
             (cliente_id, assunto, descricao, data, status)
             VALUES (?, ?, ?, ?, ?)
-            """,
-            (
-                request.form["cliente"],
-                request.form["assunto"],
-                request.form["descricao"],
-                datetime.now().strftime("%d/%m/%Y %H:%M"),
-                "Aberto"
-            )
-        )
+        """, (
+            request.form["cliente"],
+            request.form["assunto"],
+            request.form["descricao"],
+            datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "Aberto"
+        ))
         conn.commit()
         conn.close()
         return redirect("/atendimentos")
